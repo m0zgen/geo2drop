@@ -61,6 +61,6 @@ push_list
 firewall-cmd --reload
 echo "Done!"
 
-# firewall-cmd --permanent --ipset=block-countries --get-entries
+# firewall-cmd --permanent --ipset=blcountries --get-entries
 # curl https://www.ipdeny.com/ipblocks/data/countries/${i}.zone --output /tmp/${i}.zone
-# firewall-cmd --permanent --delete-ipset=blockcountries; firewall-cmd --reload
+# firewall-cmd --permanent --delete-ipset=blcountries; firewall-cmd --reload
