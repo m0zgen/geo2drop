@@ -21,5 +21,6 @@ Options:
     echo "  -mx, --maxelem <maxelem>     Maximum number of elements in the ipset list (default: 131072)"
     echo "  -hx, --hashsize <hashsize>   Hash size of the ipset list (default: 32768)"
     echo "  -a, --another                Another IP source mirror (default: ipdeny.com)"
+    echo "  -d, --delete                 Delete ipset from firewalld (default: blcountries)"
     echo "  -h, --help                   Show this message (help)"
 ```

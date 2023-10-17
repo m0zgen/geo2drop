@@ -16,6 +16,7 @@ function usage() {
     echo "  -mx, --maxelem <maxelem>     Maximum number of elements in the ipset list (default: 131072)"
     echo "  -hx, --hashsize <hashsize>   Hash size of the ipset list (default: 32768)"
     echo "  -a, --another                Another IP source mirror (default: ipdeny.com)"
+    echo "  -d, --delete                 Delete ipset from firewalld (default: blcountries)"
     echo "  -h, --help                   Show this message (help)"
     exit 0
 }
@@ -46,6 +47,11 @@ while [[ $# -gt 0 ]]; do
             ;;
         -a|--another)
             ANOTHER=1
+            shift
+            shift
+            ;;
+        -d|--delete)
+            DELETE=1
             shift
             shift
             ;;
@@ -86,6 +92,22 @@ if [[ ! -d ${TMP_CATALOG} ]]; then
     mkdir -p ${TMP_CATALOG}
 fi
 
+function delete() {
+
+    if (systemctl -q is-active firewalld.service)
+    then
+        echo "Delete ${LIST_NAME} from firewalld with standard method"
+        firewall-cmd --permanent --delete-ipset=${LIST_NAME}
+        firewall-cmd --reload
+        echo "Ipset ${LIST_NAME} deleted"
+        exit 1
+    else
+        rm  /etc/firewalld/ipsets/${LIST_NAME}.xml
+        grep -rl '${LIST_NAME}'  | xargs sed -i '/${LIST_NAME/d'
+    fi
+
+}
+
 function check_drop() {
     firewall-cmd --list-all --zone=drop > ${TMP_CATALOG}/drops.txt
     if [[ $(grep -c "${LIST_NAME}" ${TMP_CATALOG}/drops.txt) -eq 1 ]]; then
@@ -124,6 +146,11 @@ function push_list() {
     fi
     
 }
+
+if [[ "$DELETE" -eq "1" ]]; then
+    delete
+    exit 0
+fi
 
 get_sets
 check_drop
