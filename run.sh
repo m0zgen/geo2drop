@@ -15,7 +15,7 @@ function usage() {
     echo "  -l, --list <list>            Name of the ipset list (default: blcountries)"
     echo "  -mx, --maxelem <maxelem>     Maximum number of elements in the ipset list (default: 131072)"
     echo "  -hx, --hashsize <hashsize>   Hash size of the ipset list (default: 32768)"
-    echo "  -a, --another                Another IP source mirror"
+    echo "  -a, --another                Another IP source mirror (default: ipdeny.com)"
     echo "  -h, --help                   Show this message (help)"
     exit 0
 }
@@ -112,7 +112,7 @@ function get_sets() {
 
 function push_list() {
     if [[ "$ANOTHER" -eq "1" ]]; then
-        echo "Mirror mode"
+        echo "Mirror mode - Ludost.net"
         curl -s -d country=1 --data-urlencode "country_list=br cn in id" -d format_template=prefix https://ip.ludost.net/cgi/process | grep -v "^#" > ${TMP_CATALOG}/ludost.zone
         firewall-cmd --permanent --ipset=${LIST_NAME} --add-entries-from-file=${TMP_CATALOG}/ludost.zone
     else
