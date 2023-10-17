@@ -31,7 +31,6 @@ function check_drop() {
     else
         echo "Add list ${LIST_NAME} to drop zone."
         firewall-cmd --permanent --zone=drop --add-source=ipset:${LIST_NAME}
-        firewall-cmd --permanent --new-ipset=${LIST_NAME} --type=hash:net --option=hashsize=${HASHSIZE} --option=maxelem=${MAXELEM}
         firewall-cmd --reload
     fi
 }
@@ -42,7 +41,7 @@ function get_sets() {
         echo "List ${LIST_NAME} is exists. Ok"
     else
         echo "Add new list ${LIST_NAME}"
-        firewall-cmd --permanent --new-ipset=${LIST_NAME} --type=hash:net --option=maxelem=${MAXELEM}
+        firewall-cmd --permanent --new-ipset=${LIST_NAME} --type=hash:net --option=hashsize=${HASHSIZE} --option=maxelem=${MAXELEM}
         firewall-cmd --permanent --zone=drop --add-source=ipset:${LIST_NAME}
         firewall-cmd --reload
     fi
@@ -62,6 +61,6 @@ push_list
 firewall-cmd --reload
 echo "Done!"
 
-# firewall-cmd --permanent --ipset=block-countries --get-entries
+# firewall-cmd --permanent --ipset=blockcountries --get-entries
 # curl https://www.ipdeny.com/ipblocks/data/countries/${i}.zone --output /tmp/${i}.zone
-# firewall-cmd --permanent --delete-ipset=block-countries; firewall-cmd --reload
+# firewall-cmd --permanent --delete-ipset=blockcountries; firewall-cmd --reload
