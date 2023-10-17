@@ -10,7 +10,7 @@ SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
 # Initial variables
 # ---------------------------------------------------\
 COUNTRIES=(br cn in)
-LIST_NAME="block-countries"
+LIST_NAME="blcountries"
 MAXELEM=131072
 HASHSIZE=32768
 TMP_CATALOG="${SCRIPT_PATH}/tmp"
