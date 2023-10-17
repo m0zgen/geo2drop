@@ -13,10 +13,10 @@ function usage() {
     echo "Options:"
     echo "  -c, --countries <countries>  Countries to block (default: br cn in id)"
     echo "  -l, --list <list>            Name of the ipset list (default: blcountries)"
-    echo "  -m, --maxelem <maxelem>      Maximum number of elements in the ipset list (default: 131072)"
-    echo "  -h, --hashsize <hashsize>    Hash size of the ipset list (default: 32768)"
+    echo "  -mx, --maxelem <maxelem>      Maximum number of elements in the ipset list (default: 131072)"
+    echo "  -hx, --hashsize <hashsize>    Hash size of the ipset list (default: 32768)"
     echo "  -a, --another                Another IP source mirror"
-    echo "  -u, --usage                  Show this message (help)"
+    echo "  -h, --help                  Show this message (help)"
     exit 0
 }
 
@@ -34,12 +34,12 @@ while [[ $# -gt 0 ]]; do
             shift
             shift
             ;;
-        -m|--maxelem)
+        -mx|--maxelem)
             MAXELEM="$2"
             shift
             shift
             ;;
-        -h|--hashsize)
+        -hx|--hashsize)
             HASHSIZE="$2"
             shift
             shift
@@ -49,7 +49,7 @@ while [[ $# -gt 0 ]]; do
             shift
             shift
             ;;
-        -u|--usage)
+        -h|--help)
             usage
             ;;
         *)
