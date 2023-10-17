@@ -23,10 +23,8 @@ if [[ ! -d ${TMP_CATALOG} ]]; then
     mkdir -p ${TMP_CATALOG}
 fi
 
-CURRENT_SETS=$(firewall-cmd --permanent --get-ipsets > ${TMP_CATALOG}/ipsets.txt)
-CURRENT_DROPS=$(firewall-cmd --list-all --zone=drop > ${TMP_CATALOG}/drops.txt)
-
 function check_drop() {
+    firewall-cmd --list-all --zone=drop > ${TMP_CATALOG}/drops.txt
     if [[ $(grep -c "${LIST_NAME}" ${TMP_CATALOG}/drops.txt) -eq 1 ]]; then
         echo "Drops ${LIST_NAME} is exists. Ok"
     else
@@ -37,6 +35,7 @@ function check_drop() {
 }
 
 function get_sets() {
+    firewall-cmd --permanent --get-ipsets > ${TMP_CATALOG}/ipsets.txt
     if [[ $(grep -c "${LIST_NAME}" ${TMP_CATALOG}/ipsets.txt) -eq 1 ]]; then
         echo "List ${LIST_NAME} is exists. Ok"
     else
