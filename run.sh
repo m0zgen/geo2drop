@@ -1,4 +1,3 @@
-
 #!/bin/bash
 # Ban countries with firewalld and ipset script
 # Created by Yevgeniy Goncharov, https://sys-adm.in
@@ -11,7 +10,7 @@ SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
 # Initial variables
 # ---------------------------------------------------\
 COUNTRIES=(br cn in)
-LIST_NAME="blockcountries"
+LIST_NAME="block-countries"
 MAXELEM=131072
 HASHSIZE=32768
 TMP_CATALOG="${SCRIPT_PATH}/tmp"
@@ -41,6 +40,7 @@ function get_sets() {
         echo "List ${LIST_NAME} is exists. Ok"
     else
         echo "Add new list ${LIST_NAME}"
+        # firewall-cmd --permanent --new-ipset=${LIST_NAME} --type=hash:net --option=maxelem=${MAXELEM}
         firewall-cmd --permanent --new-ipset=${LIST_NAME} --type=hash:net --option=hashsize=${HASHSIZE} --option=maxelem=${MAXELEM}
         firewall-cmd --permanent --zone=drop --add-source=ipset:${LIST_NAME}
         firewall-cmd --reload
@@ -61,6 +61,6 @@ push_list
 firewall-cmd --reload
 echo "Done!"
 
-# firewall-cmd --permanent --ipset=blockcountries --get-entries
+# firewall-cmd --permanent --ipset=block-countries --get-entries
 # curl https://www.ipdeny.com/ipblocks/data/countries/${i}.zone --output /tmp/${i}.zone
 # firewall-cmd --permanent --delete-ipset=blockcountries; firewall-cmd --reload
