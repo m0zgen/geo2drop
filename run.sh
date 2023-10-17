@@ -98,13 +98,13 @@ function delete() {
     then
         echo "Delete ${LIST_NAME} from firewalld with standard method"
         firewall-cmd --permanent --delete-ipset=${LIST_NAME}
-        grep -rl '${LIST_NAME}' /etc/firewalld | xargs sed -i '/${LIST_NAME/d'
+        grep -rl '${LIST_NAME}' /etc/firewalld | xargs sed -i '/${LIST_NAME}/d'
         firewall-cmd --reload
         echo "Ipset ${LIST_NAME} deleted"
         exit 1
     else
         rm  /etc/firewalld/ipsets/${LIST_NAME}.xml
-        grep -rl '${LIST_NAME}' /etc/firewalld | xargs sed -i '/${LIST_NAME/d'
+        grep -rl '${LIST_NAME}' /etc/firewalld | xargs sed -i '/${LIST_NAME}/d'
         systemctl restart firewalld
     fi
 
