@@ -13,10 +13,10 @@ function usage() {
     echo "Options:"
     echo "  -c, --countries <countries>  Countries to block (default: br cn in id)"
     echo "  -l, --list <list>            Name of the ipset list (default: blcountries)"
-    echo "  -mx, --maxelem <maxelem>      Maximum number of elements in the ipset list (default: 131072)"
-    echo "  -hx, --hashsize <hashsize>    Hash size of the ipset list (default: 32768)"
+    echo "  -mx, --maxelem <maxelem>     Maximum number of elements in the ipset list (default: 131072)"
+    echo "  -hx, --hashsize <hashsize>   Hash size of the ipset list (default: 32768)"
     echo "  -a, --another                Another IP source mirror"
-    echo "  -h, --help                  Show this message (help)"
+    echo "  -h, --help                   Show this message (help)"
     exit 0
 }
 
