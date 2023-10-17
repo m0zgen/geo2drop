@@ -16,9 +16,10 @@ You can use the script with the following command:
 ./run.sh -u                                                                                            1 ms  master 
 Usage: ./run.sh [options]
 Options:
-  -c, --countries <countries>  Countries to block (default: br cn in id)
-  -l, --list <list>            Name of the ipset list (default: blcountries)
-  -m, --maxelem <maxelem>      Maximum number of elements in the ipset list (default: 131072)
-  -h, --hashsize <hashsize>    Hash size of the ipset list (default: 32768)
-  -u, --usage                  Show this message (help)
+    echo "  -c, --countries <countries>  Countries to block (default: br cn in id)"
+    echo "  -l, --list <list>            Name of the ipset list (default: blcountries)"
+    echo "  -mx, --maxelem <maxelem>     Maximum number of elements in the ipset list (default: 131072)"
+    echo "  -hx, --hashsize <hashsize>   Hash size of the ipset list (default: 32768)"
+    echo "  -a, --another                Another IP source mirror (default: ipdeny.com)"
+    echo "  -h, --help                   Show this message (help)"
 ```
