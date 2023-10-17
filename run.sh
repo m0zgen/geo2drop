@@ -13,6 +13,7 @@ SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
 COUNTRIES=(br cn in)
 LIST_NAME="blockcountries"
 MAXELEM=131072
+HASHSIZE=32768
 TMP_CATALOG="${SCRIPT_PATH}/tmp"
 
 # Actions
@@ -30,6 +31,7 @@ function check_drop() {
     else
         echo "Add list ${LIST_NAME} to drop zone."
         firewall-cmd --permanent --zone=drop --add-source=ipset:${LIST_NAME}
+        firewall-cmd --permanent --new-ipset=${LIST_NAME} --type=hash:net --option=hashsize=${HASHSIZE} --option=maxelem=${MAXELEM}
         firewall-cmd --reload
     fi
 }
