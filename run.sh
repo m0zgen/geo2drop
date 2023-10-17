@@ -11,7 +11,7 @@ SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
 # Initial variables
 # ---------------------------------------------------\
 COUNTRIES=(br cn in)
-LIST_NAME="block-countries"
+LIST_NAME="blockcountries"
 MAXELEM=131072
 TMP_CATALOG="${SCRIPT_PATH}/tmp"
 
@@ -62,3 +62,4 @@ echo "Done!"
 
 # firewall-cmd --permanent --ipset=block-countries --get-entries
 # curl https://www.ipdeny.com/ipblocks/data/countries/${i}.zone --output /tmp/${i}.zone
+# firewall-cmd --permanent --delete-ipset=block-countries; firewall-cmd --reload
