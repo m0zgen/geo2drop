@@ -76,6 +76,8 @@ if [[ -z ${HASHSIZE} ]]; then
     HASHSIZE=32768
 fi
 
+TMP_CATALOG="${SCRIPT_PATH}/tmp"
+
 # Actions
 # ---------------------------------------------------\
 
