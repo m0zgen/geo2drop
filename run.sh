@@ -67,7 +67,7 @@ done
 
 # VAriables
 if [[ -z ${COUNTRIES} ]]; then
-    COUNTRIES="br cn in id mx"
+    COUNTRIES="br cn in id mx py"
 fi
 
 if [[ -z ${LIST_NAME} ]]; then
