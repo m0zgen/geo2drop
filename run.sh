@@ -199,14 +199,15 @@ function setup_from_local() {
 }
 
 function add_ipset_to_drop_zone(){
+    echo "Adding ipset ${LIST_NAME} to drop zone..."
     firewall-cmd --permanent --zone=drop --add-source="ipset:${LIST_NAME}" > /dev/null
 }
 
 function checking_firewalld_status(){
     if (systemctl -q is-active firewalld.service)
     then
-        echo "Firewalld is active. Ok"
-        echo -e "\nDone!"
+        echo -e "\nFirewalld is active. Ok"
+        echo -e "Done!"
     else
         echo "Firewalld is not active. Exit..."
         exit 1
