@@ -7,6 +7,10 @@
 PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
 
+ZONES="br cn id mx py"
+TMP_CATALOG="${SCRIPT_PATH}/tmp"
+DOWNLOAD_CATALOG="${SCRIPT_PATH}/local-zones"
+
 # Usage
 function usage() {
     echo "Usage: $0 [options]"
@@ -17,6 +21,8 @@ function usage() {
     echo "  -hx, --hashsize <hashsize>   Hash size of the ipset list (default: 32768)"
     echo "  -a, --another                Another IP source mirror (default: ipdeny.com)"
     echo "  -d, --delete                 Delete ipset from firewalld (default: blcountries)"
+    echo "  -dl, --download-local        Download zones to local folder"
+    echo "  -lz, --local-zones           Setup ipsets from downloaded zones"
     echo "  -h, --help                   Show this message (help)"
     exit 0
 }
@@ -55,6 +61,16 @@ while [[ $# -gt 0 ]]; do
             shift
             shift
             ;;
+        -dl|--download-local)
+            DOWNLOAD_LOCAL=1
+            shift
+            shift
+            ;;
+        -lz|--local-zones)
+            SETUP_FROM_LOCAL=1
+            shift
+            shift
+            ;;
         -h|--help)
             usage
             ;;
@@ -67,7 +83,7 @@ done
 
 # VAriables
 if [[ -z ${COUNTRIES} ]]; then
-    COUNTRIES="br cn id mx py"
+    COUNTRIES=${ZONES}
 fi
 
 if [[ -z ${LIST_NAME} ]]; then
@@ -82,8 +98,6 @@ if [[ -z ${HASHSIZE} ]]; then
     HASHSIZE=32768
 fi
 
-TMP_CATALOG="${SCRIPT_PATH}/tmp"
-
 # Actions
 # ---------------------------------------------------\
 
@@ -91,6 +105,19 @@ TMP_CATALOG="${SCRIPT_PATH}/tmp"
 if [[ ! -d ${TMP_CATALOG} ]]; then
     mkdir -p ${TMP_CATALOG}
 fi
+
+# Check download exists
+if [[ ! -d ${DOWNLOAD_CATALOG} ]]; then
+    mkdir -p ${DOWNLOAD_CATALOG}
+fi
+
+function download_local() {
+    for i in $COUNTRIES;do 
+        echo "Downloading ${i}"
+        curl -s https://www.ipdeny.com/ipblocks/data/countries/${i}.zone --output ${DOWNLOAD_CATALOG}/${i}.zone
+        echo "Files saved to ${DOWNLOAD_CATALOG}/${i}.zone"
+    done
+}
 
 function delete() {
 
@@ -149,6 +176,19 @@ function push_list() {
     
 }
 
+function setup_from_local() {
+    # list files in download catalog
+    for i in $(ls ${DOWNLOAD_CATALOG}); do
+        echo "Processing ${i}"
+        firewall-cmd --permanent --ipset=${LIST_NAME} --add-entries-from-file=${DOWNLOAD_CATALOG}/${i}
+    done
+}
+
+if [[ "$DOWNLOAD_LOCAL" -eq "1" ]]; then
+    download_local
+    exit 0
+fi
+
 if [[ "$DELETE" -eq "1" ]]; then
     delete
     exit 0
@@ -156,7 +196,13 @@ fi
 
 get_sets
 check_drop
-push_list
+
+if [[ "$SETUP_FROM_LOCAL" -eq "1" ]]; then
+    setup_from_local
+else
+    push_list
+fi
+
 firewall-cmd --reload
 echo "Done!"
 
