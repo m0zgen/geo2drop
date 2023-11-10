@@ -156,7 +156,7 @@ function get_sets() {
     
     echo "Creating new list ${LIST_NAME}"
     # firewall-cmd --permanent --new-ipset=${LIST_NAME} --type=hash:net --option=maxelem=${MAXELEM}
-    firewall-cmd --permanent --new-ipset=${LIST_NAME} --type=hash:net --option=family=inet --option=hashsize=${HASHSIZE} --option=maxelem=${MAXELEM} --zone=drop > /dev/null 2> /dev/null
+    firewall-cmd --permanent --new-ipset=${LIST_NAME} --type=hash:net --option=family=inet --option=hashsize=${HASHSIZE} --option=maxelem=${MAXELEM} > /dev/null 2> /dev/null
     if [[ $? -eq 0 ]];then
         echo -e "Ipset for ${LIST_NAME} successfully created"
         firewall-cmd --reload
@@ -203,6 +203,10 @@ function setup_from_local() {
     done
 }
 
+function add_ipset_to_drop_zone(){
+    firewall-cmd --permanent --zone=drop --add-source="ipset:${LIST_NAME}" > /dev/null
+}
+
 function checking_firewalld_status(){
     if (systemctl -q is-active firewalld.service)
     then
@@ -233,7 +237,9 @@ else
     push_list
 fi
 
+
 # check_drop
+add_ipset_to_drop_zone
 sleep 5
 firewall-cmd --reload
 checking_firewalld_status
