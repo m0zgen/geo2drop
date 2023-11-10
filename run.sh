@@ -11,6 +11,7 @@ ZONES="br cn id mx py"
 IPSET_NAME="blcountries"
 TMP_CATALOG="${SCRIPT_PATH}/tmp"
 DOWNLOAD_CATALOG="${SCRIPT_PATH}/local-zones"
+MAX_SITE_TIMEOUT=5
 
 # Usage
 function usage() {
@@ -112,7 +113,24 @@ if [[ ! -d ${DOWNLOAD_CATALOG} ]]; then
     mkdir -p ${DOWNLOAD_CATALOG}
 fi
 
+function is_site_available() {
+
+    if /usr/bin/curl -sSf --max-time "${MAX_SITE_TIMEOUT}" "${1}" --insecure 2>/dev/null >/dev/null; then
+        true
+    else
+        false
+    fi
+}
+
 function download_local() {
+
+    if is_site_available "https://www.ipdeny.com"; then
+        echo "Site https://www.ipdeny.com is available. Ok"
+    else
+        echo "Site https://www.ipdeny.com is not available. Exit..."
+        exit 1
+    fi
+
     for i in $COUNTRIES;do 
         echo "Downloading ${i}"
         curl -s https://www.ipdeny.com/ipblocks/data/countries/${i}.zone --output ${DOWNLOAD_CATALOG}/${i}.zone
