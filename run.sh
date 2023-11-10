@@ -193,14 +193,8 @@ function setup_from_local() {
     # list files in download catalog
     echo ""
     for i in $(ls ${DOWNLOAD_CATALOG}); do
-        echo "Processing ${i}"
-        firewall-cmd --permanent --ipset=${LIST_NAME} --add-entries-from-file=${DOWNLOAD_CATALOG}/${i}.zone > /dev/null 2> /dev/null
-        if [[ $? -eq 0 ]];then
-            echo -e "Zone from local file ${i} successfully added to ${LIST_NAME}"
-        else
-            echo -e "Couldn't add zone from local file ${i} to ${LIST_NAME}. Exit..."
-            exit 1
-        fi
+        echo "Processing ${DOWNLOAD_CATALOG}/${i}.zone"
+        firewall-cmd --permanent --ipset=${LIST_NAME} --add-entries-from-file=${DOWNLOAD_CATALOG}/${i}.zone
     done
 }
 
