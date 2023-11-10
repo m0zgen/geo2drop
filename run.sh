@@ -124,14 +124,13 @@ function delete() {
 
     if (systemctl -q is-active firewalld.service)
     then
-        echo "Delete ${LIST_NAME} from firewalld with standard method"
         if firewall-cmd --permanent --get-ipsets | grep -q "${LIST_NAME}"; then
+            echo -e "\nDeleting ${LIST_NAME} with standard method..."
             firewall-cmd --permanent --zone=drop --remove-source=ipset:"${LIST_NAME}" &> /dev/null
             firewall-cmd --reload &> /dev/null
             firewall-cmd --permanent --delete-ipset=${LIST_NAME} &> /dev/null
             # grep -rl "${LIST_NAME}" /etc/firewalld | xargs sed -i "/${LIST_NAME}/d"
             firewall-cmd --reload
-            echo "Ipset ${LIST_NAME} deleted"
         fi
     else
         rm  /etc/firewalld/ipsets/${LIST_NAME}.xml
@@ -154,11 +153,10 @@ function check_drop() {
 
 function get_sets() {    
     
-    echo "Creating new list ${LIST_NAME}"
+    echo -e "\nCreating new list ${LIST_NAME}..."
     # firewall-cmd --permanent --new-ipset=${LIST_NAME} --type=hash:net --option=maxelem=${MAXELEM}
     firewall-cmd --permanent --new-ipset=${LIST_NAME} --type=hash:net --option=family=inet --option=hashsize=${HASHSIZE} --option=maxelem=${MAXELEM} > /dev/null 2> /dev/null
     if [[ $? -eq 0 ]];then
-        echo -e "Ipset for ${LIST_NAME} successfully created"
         firewall-cmd --reload
     else
         echo -e "Couldn't create the blacklist ${LIST_NAME}. Exit..."
@@ -199,7 +197,7 @@ function setup_from_local() {
 }
 
 function add_ipset_to_drop_zone(){
-    echo "Adding ipset ${LIST_NAME} to drop zone..."
+    echo -e "\nAdding ipset ${LIST_NAME} to drop zone..."
     firewall-cmd --permanent --zone=drop --add-source="ipset:${LIST_NAME}" > /dev/null
 }
 
