@@ -191,9 +191,10 @@ function push_list() {
 
 function setup_from_local() {
     # list files in download catalog
+    echo ""
     for i in $(ls ${DOWNLOAD_CATALOG}); do
         echo "Processing ${i}"
-        firewall-cmd --permanent --ipset=${LIST_NAME} --add-entries-from-file=${TMP_CATALOG}/${i}.zone > /dev/null 2> /dev/null
+        firewall-cmd --permanent --ipset=${LIST_NAME} --add-entries-from-file=${DOWNLOAD_CATALOG}/${i}.zone > /dev/null 2> /dev/null
         if [[ $? -eq 0 ]];then
             echo -e "Zone from local file ${i} successfully added to ${LIST_NAME}"
         else
@@ -211,7 +212,7 @@ function checking_firewalld_status(){
     if (systemctl -q is-active firewalld.service)
     then
         echo "Firewalld is active. Ok"
-        echo "Done!"
+        echo -e "\nDone!"
     else
         echo "Firewalld is not active. Exit..."
         exit 1
