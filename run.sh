@@ -5,7 +5,7 @@
 # Sys env / paths / etc
 # -------------------------------------------------------------------------------------------\
 PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
-SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
+SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd); cd ${SCRIPT_PATH}
 
 ZONES="br cn id mx py"
 IPSET_NAME="blcountries"
