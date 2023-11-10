@@ -8,6 +8,7 @@ PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
 
 ZONES="br cn id mx py"
+IPSET_NAME="blcountries"
 TMP_CATALOG="${SCRIPT_PATH}/tmp"
 DOWNLOAD_CATALOG="${SCRIPT_PATH}/local-zones"
 
@@ -87,7 +88,7 @@ if [[ -z ${COUNTRIES} ]]; then
 fi
 
 if [[ -z ${LIST_NAME} ]]; then
-    LIST_NAME="blcountries"
+    LIST_NAME=${IPSET_NAME}
 fi
 
 if [[ -z ${MAXELEM} ]]; then
@@ -95,7 +96,7 @@ if [[ -z ${MAXELEM} ]]; then
 fi
 
 if [[ -z ${HASHSIZE} ]]; then
-    HASHSIZE=32768
+    HASHSIZE=4096
 fi
 
 # Actions
@@ -124,11 +125,14 @@ function delete() {
     if (systemctl -q is-active firewalld.service)
     then
         echo "Delete ${LIST_NAME} from firewalld with standard method"
-        firewall-cmd --permanent --delete-ipset=${LIST_NAME}
-        grep -rl "${LIST_NAME}" /etc/firewalld | xargs sed -i "/${LIST_NAME}/d"
-        firewall-cmd --reload
-        echo "Ipset ${LIST_NAME} deleted"
-        exit 1
+        if firewall-cmd --permanent --get-ipsets | grep -q "${LIST_NAME}"; then
+            firewall-cmd --permanent --zone=drop --remove-source=ipset:"${LIST_NAME}"
+            firewall-cmd --reload &> /dev/null
+            firewall-cmd --permanent --delete-ipset=${LIST_NAME} &> /dev/null
+            # grep -rl "${LIST_NAME}" /etc/firewalld | xargs sed -i "/${LIST_NAME}/d"
+            firewall-cmd --reload
+            echo "Ipset ${LIST_NAME} deleted"
+        fi
     else
         rm  /etc/firewalld/ipsets/${LIST_NAME}.xml
         grep -rl "${LIST_NAME}" /etc/firewalld | xargs sed -i "/${LIST_NAME}/d"
@@ -137,9 +141,9 @@ function delete() {
 
 }
 
+# Add existing ipset to drop zone
 function check_drop() {
-    firewall-cmd --list-all --zone=drop > ${TMP_CATALOG}/drops.txt
-    if [[ $(grep -c "${LIST_NAME}" ${TMP_CATALOG}/drops.txt) -eq 1 ]]; then
+    if firewall-cmd --permanent --get-ipsets | grep -q "${LIST_NAME}"; then
         echo "Drops ${LIST_NAME} is exists. Ok"
     else
         echo "Add list ${LIST_NAME} to drop zone."
@@ -148,17 +152,19 @@ function check_drop() {
     fi
 }
 
-function get_sets() {
-    firewall-cmd --permanent --get-ipsets > ${TMP_CATALOG}/ipsets.txt
-    if [[ $(grep -c "${LIST_NAME}" ${TMP_CATALOG}/ipsets.txt) -eq 1 ]]; then
-        echo "List ${LIST_NAME} is exists. Ok"
-    else
-        echo "Add new list ${LIST_NAME}"
-        # firewall-cmd --permanent --new-ipset=${LIST_NAME} --type=hash:net --option=maxelem=${MAXELEM}
-        firewall-cmd --permanent --new-ipset=${LIST_NAME} --type=hash:net --option=hashsize=${HASHSIZE} --option=maxelem=${MAXELEM}
-        firewall-cmd --permanent --zone=drop --add-source=ipset:${LIST_NAME}
+function get_sets() {    
+    
+    echo "Creating new list ${LIST_NAME}"
+    # firewall-cmd --permanent --new-ipset=${LIST_NAME} --type=hash:net --option=maxelem=${MAXELEM}
+    firewall-cmd --permanent --new-ipset=${LIST_NAME} --type=hash:net --option=family=inet --option=hashsize=${HASHSIZE} --option=maxelem=${MAXELEM} --zone=drop > /dev/null 2> /dev/null
+    if [[ $? -eq 0 ]];then
+        echo -e "Ipset for ${LIST_NAME} successfully created"
         firewall-cmd --reload
+    else
+        echo -e "Couldn't create the blacklist ${LIST_NAME}. Exit..."
+        exit 1
     fi
+
 }
 
 function push_list() {
@@ -170,7 +176,14 @@ function push_list() {
         for i in $COUNTRIES;do 
             echo "Processing ${i}"
             curl -s https://www.ipdeny.com/ipblocks/data/countries/${i}.zone --output ${TMP_CATALOG}/${i}.zone
-            firewall-cmd --permanent --ipset=${LIST_NAME} --add-entries-from-file=${TMP_CATALOG}/${i}.zone
+            echo "File saved to ${TMP_CATALOG}/${i}.zone. Adding to ipset ${LIST_NAME}..."
+            firewall-cmd --permanent --ipset=${LIST_NAME} --add-entries-from-file=${TMP_CATALOG}/${i}.zone > /dev/null 2> /dev/null
+            if [[ $? -eq 0 ]];then
+                echo -e "Zone ${i} successfully added to ${LIST_NAME}"
+            else
+                echo -e "Couldn't add zone ${i} to ${LIST_NAME}. Exit..."
+                exit 1
+            fi
         done
     fi
     
@@ -194,8 +207,8 @@ if [[ "$DELETE" -eq "1" ]]; then
     exit 0
 fi
 
+delete
 get_sets
-check_drop
 
 if [[ "$SETUP_FROM_LOCAL" -eq "1" ]]; then
     setup_from_local
@@ -203,6 +216,7 @@ else
     push_list
 fi
 
+# check_drop
 sleep 5
 firewall-cmd --reload
 echo "Done!"
