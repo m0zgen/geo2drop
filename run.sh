@@ -203,6 +203,7 @@ else
     push_list
 fi
 
+sleep 5
 firewall-cmd --reload
 echo "Done!"
 
