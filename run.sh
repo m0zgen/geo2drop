@@ -126,7 +126,7 @@ function delete() {
     then
         echo "Delete ${LIST_NAME} from firewalld with standard method"
         if firewall-cmd --permanent --get-ipsets | grep -q "${LIST_NAME}"; then
-            firewall-cmd --permanent --zone=drop --remove-source=ipset:"${LIST_NAME}"
+            firewall-cmd --permanent --zone=drop --remove-source=ipset:"${LIST_NAME}" &> /dev/null
             firewall-cmd --reload &> /dev/null
             firewall-cmd --permanent --delete-ipset=${LIST_NAME} &> /dev/null
             # grep -rl "${LIST_NAME}" /etc/firewalld | xargs sed -i "/${LIST_NAME}/d"
@@ -203,6 +203,17 @@ function setup_from_local() {
     done
 }
 
+function checking_firewalld_status(){
+    if (systemctl -q is-active firewalld.service)
+    then
+        echo "Firewalld is active. Ok"
+        echo "Done!"
+    else
+        echo "Firewalld is not active. Exit..."
+        exit 1
+    fi
+}
+
 if [[ "$DOWNLOAD_LOCAL" -eq "1" ]]; then
     download_local
     exit 0
@@ -225,7 +236,8 @@ fi
 # check_drop
 sleep 5
 firewall-cmd --reload
-echo "Done!"
+checking_firewalld_status
+
 
 # firewall-cmd --permanent --ipset=blcountries --get-entries
 # curl https://www.ipdeny.com/ipblocks/data/countries/${i}.zone --output /tmp/${i}.zone
