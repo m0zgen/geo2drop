@@ -200,7 +200,7 @@ function checking_firewalld_status(){
     if (systemctl -q is-active firewalld.service)
     then
         echo -e "\nFirewalld is active. Ok"
-        echo -e "Done!"
+        echo -e "Done!\n"
     else
         echo "Firewalld is not active. Exit..."
         exit 1
