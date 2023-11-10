@@ -120,7 +120,7 @@ function download_local() {
     done
 }
 
-function delete() {
+function delete_ipset() {
 
     if (systemctl -q is-active firewalld.service)
     then
@@ -151,7 +151,7 @@ function check_drop() {
     fi
 }
 
-function get_sets() {    
+function create_ipset() {    
     
     echo -e "\nCreating new list ${LIST_NAME}..."
     # firewall-cmd --permanent --new-ipset=${LIST_NAME} --type=hash:net --option=maxelem=${MAXELEM}
@@ -165,7 +165,7 @@ function get_sets() {
 
 }
 
-function push_list() {
+function setup_from_online() {
     if [[ "$ANOTHER" -eq "1" ]]; then
         echo "Mirror mode - Ludost.net"
         curl -s -d country=1 --data-urlencode "country_list=br cn in id" -d format_template=prefix https://ip.ludost.net/cgi/process | grep -v "^#" > ${TMP_CATALOG}/ludost.zone
@@ -196,11 +196,6 @@ function setup_from_local() {
     done
 }
 
-function add_ipset_to_drop_zone(){
-    echo -e "\nAdding ipset ${LIST_NAME} to drop zone..."
-    firewall-cmd --permanent --zone=drop --add-source="ipset:${LIST_NAME}" > /dev/null
-}
-
 function checking_firewalld_status(){
     if (systemctl -q is-active firewalld.service)
     then
@@ -212,23 +207,29 @@ function checking_firewalld_status(){
     fi
 }
 
+function add_ipset_to_drop_zone(){
+    echo -e "\nAdding ipset ${LIST_NAME} to drop zone..."
+    firewall-cmd --permanent --zone=drop --add-source="ipset:${LIST_NAME}"
+}
+
+
 if [[ "$DOWNLOAD_LOCAL" -eq "1" ]]; then
     download_local
     exit 0
 fi
 
 if [[ "$DELETE" -eq "1" ]]; then
-    delete
+    delete_ipset
     exit 0
 fi
 
-delete
-get_sets
+delete_ipset
+create_ipset
 
 if [[ "$SETUP_FROM_LOCAL" -eq "1" ]]; then
     setup_from_local
 else
-    push_list
+    setup_from_online
 fi
 
 
