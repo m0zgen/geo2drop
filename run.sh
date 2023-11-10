@@ -193,8 +193,8 @@ function setup_from_local() {
     # list files in download catalog
     echo ""
     for i in $(ls ${DOWNLOAD_CATALOG}); do
-        echo "Processing ${DOWNLOAD_CATALOG}/${i}.zone"
-        firewall-cmd --permanent --ipset=${LIST_NAME} --add-entries-from-file=${DOWNLOAD_CATALOG}/${i}.zone
+        echo "Processing ${DOWNLOAD_CATALOG}/${i}"
+        firewall-cmd --permanent --ipset=${LIST_NAME} --add-entries-from-file=${DOWNLOAD_CATALOG}/${i}
     done
 }
 
