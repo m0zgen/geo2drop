@@ -29,6 +29,7 @@ function usage() {
     echo "  -di, --delete-ipset          Delete ipset from firewalld (default: blcountries)"
     echo "  -dl, --download-local        Download zones to local folder"
     echo "  -lz, --local-zones           Setup ipsets from local downloaded zones"
+    echo "  -sa, --setup-from-archive    Setup ipset from downloaded archive"
     echo "  -h, --help                   Show this message (help)"
     exit 0
 }
@@ -79,6 +80,11 @@ while [[ $# -gt 0 ]]; do
             ;;
         -lz|--local-zones)
             SETUP_FROM_LOCAL=1
+            shift
+            shift
+            ;;
+        -sa|--setup-from-archive)
+            SETUP_FROM_ARCHIVE=1
             shift
             shift
             ;;
@@ -229,6 +235,20 @@ function check_all_zones_archive_size() {
 
 }
 
+function setup_from_archive(){
+
+    check_all_zones_archive_size
+    for i in $COUNTRIES;do 
+        if [[ -f "${UNPACK_CATALOG}/${i}.zone" ]]; then
+            echo "Processing ${i}"
+            firewall-cmd --permanent --ipset=${LIST_NAME} --add-entries-from-file=${UNPACK_CATALOG}/${i}.zone
+        else
+            echo "File ${i}.zone not found. Exit..."
+        fi
+    done
+
+}
+
 function delete_ipset() {
 
     if (systemctl -q is-active firewalld.service)
@@ -342,9 +362,13 @@ create_ipset
 
 if [[ "$SETUP_FROM_LOCAL" -eq "1" ]]; then
     setup_from_local
+elif [[ "$SETUP_FROM_ARCHIVE" -eq "1" ]]; then
+    setup_from_archive
 else
     setup_from_online
 fi
+
+
 
 
 # check_drop
