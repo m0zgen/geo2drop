@@ -241,9 +241,14 @@ function setup_from_archive(){
     if [[ ! -f "${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz" ]]; then
         echo "File not exists. Downloading..."
         download_all_zones
+    else
+        tar -xzf ${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz -C ${UNPACK_CATALOG}
+        echo "Files unpacked to ${UNPACK_CATALOG}"
     fi
 
     for i in $COUNTRIES;do 
+        echo "Checking ${UNPACK_CATALOG}/${i}.zone"
+
         if [[ -f "${UNPACK_CATALOG}/${i}.zone" ]]; then
             echo "Processing ${i}"
             firewall-cmd --permanent --ipset=${LIST_NAME} --add-entries-from-file=${UNPACK_CATALOG}/${i}.zone
