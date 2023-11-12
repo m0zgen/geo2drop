@@ -208,14 +208,6 @@ function download_all_zones(){
 
 function check_all_zones_archive_size() {
 
-    if is_site_available "${IPDENY_ROOT_URL}"; then
-        echo "Site ${IPDENY_ROOT_URL} is available. Ok"
-        echo "Checking file size..."
-    else
-        echo "Site ${IPDENY_ROOT_URL} is not available. Exit..."
-        exit 1
-    fi
-
     # Check file exists
     if [[ ! -f "${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz" ]]; then
         echo "File not exists. Downloading..."
