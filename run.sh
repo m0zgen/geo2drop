@@ -155,6 +155,33 @@ function download_local() {
         curl -s ${IPDENY_ROOT_URL}/ipblocks/data/countries/${i}.zone --output ${DOWNLOAD_CATALOG}/${i}.zone
         echo "Files saved to ${DOWNLOAD_CATALOG}/${i}.zone"
     done
+
+}
+
+function check_all_zones_archive_size() {
+
+    if is_site_available "${IPDENY_ROOT_URL}"; then
+        echo "Site ${IPDENY_ROOT_URL} is available. Ok"
+        echo "Checking file size..."
+    else
+        echo "Site ${IPDENY_ROOT_URL} is not available. Exit..."
+        exit 1
+    fi
+
+    # Check file exists
+    if [[ ! -f "${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz" ]]; then
+        local LocalFileSize=$(stat -c%s "${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz")
+        local RemoteFileSize=$(curl -sI ${IPDENY_ROOT_URL}/ipblocks/data/countries/all-zones.tar.gz | grep -i Content-Length | awk '{print $2}' | tr -d '\r')
+        echo -e "Local file size: ${LocalFileSize}. Remote file size: ${RemoteFileSize}."
+
+        if [[ "${LocalFileSize}" -eq "${RemoteFileSize}" ]]; then
+            echo "File size is equal. Ok"
+        else
+            echo "File size is not equal. Downloading..."
+            download_all_zones
+        fi
+    fi
+
 }
 
 function download_all_zones(){
@@ -170,6 +197,36 @@ function download_all_zones(){
     echo "File saved to ${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz"
     tar -xzf ${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz -C ${UNPACK_CATALOG}
     echo "Files unpacked to ${UNPACK_CATALOG}"
+
+}
+
+function check_all_zones_archive_size() {
+
+    if is_site_available "${IPDENY_ROOT_URL}"; then
+        echo "Site ${IPDENY_ROOT_URL} is available. Ok"
+        echo "Checking file size..."
+    else
+        echo "Site ${IPDENY_ROOT_URL} is not available. Exit..."
+        exit 1
+    fi
+
+    # Check file exists
+    if [[ ! -f "${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz" ]]; then
+        echo "File not exists. Downloading..."
+        download_all_zones
+    fi
+
+    local LocalFileSize=$(wc -c < "${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz" | tr -d ' ')
+    local RemoteFileSize=$(curl -sI ${IPDENY_ROOT_URL}/ipblocks/data/countries/all-zones.tar.gz | awk '/content-length/ {sub("\r",""); print $2}' | tr -d ' ')
+    echo -e "Local file size: ${LocalFileSize}. Remote file size: ${RemoteFileSize}."
+
+    if [[ "${LocalFileSize}" -eq "${RemoteFileSize}" ]]; then
+        echo "File size is equal. Ok"
+    else
+        echo "File size is not equal. Downloading..."
+        download_all_zones
+    fi
+
 }
 
 function delete_ipset() {
@@ -265,7 +322,7 @@ function add_ipset_to_drop_zone(){
 }
 
 if [[ "$DOWNLOAD_ALL_ZONES" -eq "1" ]]; then
-    download_all_zones
+    check_all_zones_archive_size
     exit 0
 fi
 
