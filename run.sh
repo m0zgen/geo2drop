@@ -9,8 +9,11 @@ SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd); cd ${SCRIPT_PATH}
 
 ZONES="br cn id mx py"
 IPSET_NAME="blcountries"
+IPDENY_ROOT_URL="https://www.ipdeny.com"
 TMP_CATALOG="${SCRIPT_PATH}/tmp"
 DOWNLOAD_CATALOG="${SCRIPT_PATH}/local-zones"
+DOWNLOAD_FULL_CATALOG="${SCRIPT_PATH}/download"
+UNPACK_CATALOG="${SCRIPT_PATH}/unpack"
 MAX_SITE_TIMEOUT=5
 
 # Usage
@@ -18,13 +21,14 @@ function usage() {
     echo "Usage: $0 [options]"
     echo "Options:"
     echo "  -c, --countries <countries>  Countries to block (default: br cn in id)"
-    echo "  -l, --list <list>            Name of the ipset list (default: blcountries)"
+    echo "  -ln, --list-name <list>      Name of the ipset list (default: blcountries)"
     echo "  -mx, --maxelem <maxelem>     Maximum number of elements in the ipset list (default: 131072)"
     echo "  -hx, --hashsize <hashsize>   Hash size of the ipset list (default: 32768)"
-    echo "  -a, --another                Another IP source mirror (default: ipdeny.com)"
-    echo "  -d, --delete                 Delete ipset from firewalld (default: blcountries)"
+    echo "  -am, --alternative-mirror    Another IP source mirror (default: ipdeny.com)"
+    echo "  -daz, --download-all-zones   Download all country zones from ipdeny.com (all-zones.tar.gz)"
+    echo "  -di, --delete-ipset          Delete ipset from firewalld (default: blcountries)"
     echo "  -dl, --download-local        Download zones to local folder"
-    echo "  -lz, --local-zones           Setup ipsets from downloaded zones"
+    echo "  -lz, --local-zones           Setup ipsets from local downloaded zones"
     echo "  -h, --help                   Show this message (help)"
     exit 0
 }
@@ -38,7 +42,7 @@ while [[ $# -gt 0 ]]; do
             shift
             shift
             ;;
-        -l|--list)
+        -ln|--list-name)
             LIST_NAME="$2"
             shift
             shift
@@ -53,13 +57,18 @@ while [[ $# -gt 0 ]]; do
             shift
             shift
             ;;
-        -a|--another)
+        -am|--alternative-mirror)
             ANOTHER=1
             shift
             shift
             ;;
-        -d|--delete)
+        -di|--delete-ipset)
             DELETE=1
+            shift
+            shift
+            ;;
+        -daz|--download-all-zones)
+            DOWNLOAD_ALL_ZONES=1
             shift
             shift
             ;;
@@ -113,6 +122,16 @@ if [[ ! -d ${DOWNLOAD_CATALOG} ]]; then
     mkdir -p ${DOWNLOAD_CATALOG}
 fi
 
+# Check download exists
+if [[ ! -d ${DOWNLOAD_FULL_CATALOG} ]]; then
+    mkdir -p ${DOWNLOAD_FULL_CATALOG}
+fi
+
+# Check unpack exists
+if [[ ! -d ${UNPACK_CATALOG} ]]; then
+    mkdir -p ${UNPACK_CATALOG}
+fi
+
 function is_site_available() {
 
     if /usr/bin/curl -sSf --max-time "${MAX_SITE_TIMEOUT}" "${1}" --insecure 2>/dev/null >/dev/null; then
@@ -124,18 +143,33 @@ function is_site_available() {
 
 function download_local() {
 
-    if is_site_available "https://www.ipdeny.com"; then
-        echo "Site https://www.ipdeny.com is available. Ok"
+    if is_site_available "${IPDENY_ROOT_URL}"; then
+        echo "Site ${IPDENY_ROOT_URL} is available. Ok"
     else
-        echo "Site https://www.ipdeny.com is not available. Exit..."
+        echo "Site ${IPDENY_ROOT_URL} is not available. Exit..."
         exit 1
     fi
 
     for i in $COUNTRIES;do 
         echo "Downloading ${i}"
-        curl -s https://www.ipdeny.com/ipblocks/data/countries/${i}.zone --output ${DOWNLOAD_CATALOG}/${i}.zone
+        curl -s ${IPDENY_ROOT_URL}/ipblocks/data/countries/${i}.zone --output ${DOWNLOAD_CATALOG}/${i}.zone
         echo "Files saved to ${DOWNLOAD_CATALOG}/${i}.zone"
     done
+}
+
+function download_all_zones(){
+    
+    if is_site_available "${IPDENY_ROOT_URL}"; then
+        echo "Site ${IPDENY_ROOT_URL} is available. Ok"
+    else
+        echo "Site ${IPDENY_ROOT_URL} is not available. Exit..."
+        exit 1
+    fi
+
+    curl -s ${IPDENY_ROOT_URL}/ipblocks/data/countries/all-zones.tar.gz --output ${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz
+    echo "File saved to ${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz"
+    tar -xzf ${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz -C ${UNPACK_CATALOG}
+    echo "Files unpacked to ${UNPACK_CATALOG}"
 }
 
 function delete_ipset() {
@@ -191,7 +225,7 @@ function setup_from_online() {
     else
         for i in $COUNTRIES;do 
             echo "Processing ${i}"
-            curl -s https://www.ipdeny.com/ipblocks/data/countries/${i}.zone --output ${TMP_CATALOG}/${i}.zone
+            curl -s ${IPDENY_ROOT_URL}/ipblocks/data/countries/${i}.zone --output ${TMP_CATALOG}/${i}.zone
             echo "File saved to ${TMP_CATALOG}/${i}.zone. Adding to ipset ${LIST_NAME}..."
             firewall-cmd --permanent --ipset=${LIST_NAME} --add-entries-from-file=${TMP_CATALOG}/${i}.zone > /dev/null 2> /dev/null
             if [[ $? -eq 0 ]];then
@@ -229,6 +263,11 @@ function add_ipset_to_drop_zone(){
     echo -e "\nAdding ipset ${LIST_NAME} to drop zone..."
     firewall-cmd --permanent --zone=drop --add-source="ipset:${LIST_NAME}"
 }
+
+if [[ "$DOWNLOAD_ALL_ZONES" -eq "1" ]]; then
+    download_all_zones
+    exit 0
+fi
 
 
 if [[ "$DOWNLOAD_LOCAL" -eq "1" ]]; then
