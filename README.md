@@ -5,22 +5,58 @@ With installed firewalld drop zone and ipset, you can block countries with the f
 Change the variable `COUNTRIES` to the country you want to block.
 
 ```bash
-COUNTRIES="br cn in"
+ZONES="br cn in"
 ```
+
+## Features
+
+- [x] Download defined zones from ipdeny.com
+- [x] Download all zones from ipdeny.com with archive
+- [x] Download zones to local folder
+- [x] Setup ipsets from local downloaded zones
+- [x] Setup ipset from downloaded archive
+- [x] Delete ipset from firewalld
+- [x] Setup ipset from local downloaded zones
+- [x] Setup ipset from downloaded archive
+- [x] Add zones from files located in repo (if ipdeny site not available)
+- [x] Use alternative zones mirror (if ipdeny site not available)
 
 ## Usage
 
 You can use the script with the following command:
 
 ```bash
-./run.sh -u                                                                                            1 ms  master 
+./run.sh -daz; ./run.sh -sa
+```
+
+Or just run:
+
+```bash
+./run.sh
+```
+
+Or from try download zones, if it not available install it from repo located zones:
+
+```bash
+./run.sh -dl; ./run.sh -lz
+```
+
+## Usage commands
+
+You can use the script with the following command:
+
+```bash
 Usage: ./run.sh [options]
 Options:
-    echo "  -c, --countries <countries>  Countries to block (default: br cn in id)"
-    echo "  -l, --list <list>            Name of the ipset list (default: blcountries)"
-    echo "  -mx, --maxelem <maxelem>     Maximum number of elements in the ipset list (default: 131072)"
-    echo "  -hx, --hashsize <hashsize>   Hash size of the ipset list (default: 32768)"
-    echo "  -a, --another                Another IP source mirror (default: ipdeny.com)"
-    echo "  -d, --delete                 Delete ipset from firewalld (default: blcountries)"
-    echo "  -h, --help                   Show this message (help)"
+  -c, --countries <countries>  Countries to block (default: br cn in id)
+  -ln, --list-name <list>      Name of the ipset list (default: blcountries)
+  -mx, --maxelem <maxelem>     Maximum number of elements in the ipset list (default: 131072)
+  -hx, --hashsize <hashsize>   Hash size of the ipset list (default: 32768)
+  -am, --alternative-mirror    Another IP source mirror (default: ipdeny.com)
+  -daz, --download-all-zones   Download all country zones from ipdeny.com (all-zones.tar.gz)
+  -di, --delete-ipset          Delete ipset from firewalld (default: blcountries)
+  -dl, --download-local        Download zones to local folder
+  -lz, --local-zones           Setup ipsets from local downloaded zones
+  -sa, --setup-from-archive    Setup ipset from downloaded archive
+  -h, --help                   Show this message (help)
 ```
