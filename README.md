@@ -49,6 +49,12 @@ You can pass multiple argument to the script:
 
 Script will try to download `br` zone from ipdeny.com and setup ipset from local downloaded zones, if ipdeny site not available, script will setup ipset from repo located zones.
 
+## Cron.d example
+
+```bash
+0 1 * * * root /path/to/geo2drop/run.sh -ll -sl
+```
+
 ## Usage commands
 
 You can use the script with the following command `./run.sh -h`:
