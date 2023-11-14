@@ -41,6 +41,14 @@ Or from try download zones, if it not available install it from repo located zon
 ./run.sh -dl; ./run.sh -lz
 ```
 
+You can pass multiple argument to the script:
+
+```bash
+./run.sh -c "br" -sl
+```
+
+Script will try to download `br` zone from ipdeny.com and setup ipset from local downloaded zones, if ipdeny site not available, script will setup ipset from repo located zones.
+
 ## Usage commands
 
 You can use the script with the following command:
