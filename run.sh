@@ -20,7 +20,7 @@ MAX_SITE_TIMEOUT=5
 function usage() {
     echo "Usage: $0 [options]"
     echo "Options:"
-    echo "  -c, --countries <countries>  Countries to block (default: br cn in id)"
+    # echo "  -c, --countries <countries>  Countries to block (default: br cn in id)"
     echo "  -ln, --list-name <list>      Name of the ipset list (default: blcountries)"
     echo "  -mx, --maxelem <maxelem>     Maximum number of elements in the ipset list (default: 131072)"
     echo "  -hx, --hashsize <hashsize>   Hash size of the ipset list (default: 32768)"

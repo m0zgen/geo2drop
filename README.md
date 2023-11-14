@@ -48,7 +48,6 @@ You can use the script with the following command:
 ```bash
 Usage: ./run.sh [options]
 Options:
-  -c, --countries <countries>  Countries to block (default: br cn in id)
   -ln, --list-name <list>      Name of the ipset list (default: blcountries)
   -mx, --maxelem <maxelem>     Maximum number of elements in the ipset list (default: 131072)
   -hx, --hashsize <hashsize>   Hash size of the ipset list (default: 32768)
