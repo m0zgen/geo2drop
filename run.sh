@@ -10,6 +10,7 @@ SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd); cd ${SCRIPT_PATH}
 ZONES="br cn id mx py"
 IPSET_NAME="blcountries"
 IPDENY_ROOT_URL="https://www.ipdeny.com"
+LOCAL_LIST="${SCRIPT_PATH}/local.list"
 TMP_CATALOG="${SCRIPT_PATH}/tmp"
 DOWNLOAD_CATALOG="${SCRIPT_PATH}/local-zones"
 DOWNLOAD_FULL_CATALOG="${SCRIPT_PATH}/download"
@@ -72,6 +73,9 @@ while [[ $# -gt 0 ]]; do
         -sa|--setup-from-archive)
             SETUP_FROM_ARCHIVE=1
             ;;
+        -ll|--local-country-list)
+            LOCAL_COUNTRY_LIST=1
+            ;;
         -d|--debug)
             DEBUG=1
             ;;
@@ -88,7 +92,12 @@ done
 
 # VAriables
 if [[ -z ${COUNTRIES} ]]; then
-    COUNTRIES=${ZONES}
+    # COUNTRIES=${ZONES}
+    if [[ ${LOCAL_COUNTRY_LIST} ]]; then
+        COUNTRIES=$(cat ${LOCAL_LIST})
+    else
+        COUNTRIES=${ZONES}
+    fi
 fi
 
 if [[ -z ${LIST_NAME} ]]; then
@@ -380,6 +389,7 @@ if [[ ! "$DEBUG" -eq "1" ]]; then
 fi
 
 if [[ "$SETUP_FROM_LOCAL" -eq "1" ]]; then
+    echo $COUNTRIES
     setup_from_local
 elif [[ "$SETUP_FROM_ARCHIVE" -eq "1" ]]; then
     setup_from_archive
