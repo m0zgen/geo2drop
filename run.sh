@@ -367,7 +367,7 @@ function add_ipset_to_drop_zone(){
 
 # Main
 
-echo "Defined Countries: $COUNTRIES""
+echo "Defined Countries: $COUNTRIES"
 
 if [[ "$DOWNLOAD_ALL_ZONES" -eq "1" ]]; then
     check_all_zones_archive_size
