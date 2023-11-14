@@ -21,7 +21,7 @@ MAX_SITE_TIMEOUT=5
 function usage() {
     echo "Usage: $0 [options]"
     echo "Options:"
-    # echo "  -c, --countries <countries>  Countries to block (default: br cn in id)"
+    echo "  -c, --countries <countries>  Countries to block (default: br cn in id)"
     echo "  -ln, --list-name <list>      Name of the ipset list (default: blcountries)"
     echo "  -mx, --maxelem <maxelem>     Maximum number of elements in the ipset list (default: 131072)"
     echo "  -hx, --hashsize <hashsize>   Hash size of the ipset list (default: 32768)"
@@ -29,6 +29,7 @@ function usage() {
     echo "  -daz, --download-all-zones   Download all country zones from ipdeny.com (all-zones.tar.gz)"
     echo "  -di, --delete-ipset          Delete ipset from firewalld (default: blcountries)"
     echo "  -dl, --download-local        Download zones to local folder"
+    echo "  -ll, --local-country-list    Define local country list (default: local.list)"
     echo "  -sl, --setup-from-local      Setup ipsets from local downloaded zones"
     echo "  -sa, --setup-from-archive    Setup ipset from downloaded archive"
     echo "  -h, --help                   Show this message (help)"
@@ -366,6 +367,8 @@ function add_ipset_to_drop_zone(){
 
 # Main
 
+echo "Defined Countries: $COUNTRIES""
+
 if [[ "$DOWNLOAD_ALL_ZONES" -eq "1" ]]; then
     check_all_zones_archive_size
     exit 0
@@ -389,7 +392,6 @@ if [[ ! "$DEBUG" -eq "1" ]]; then
 fi
 
 if [[ "$SETUP_FROM_LOCAL" -eq "1" ]]; then
-    echo $COUNTRIES
     setup_from_local
 elif [[ "$SETUP_FROM_ARCHIVE" -eq "1" ]]; then
     setup_from_archive

@@ -51,7 +51,7 @@ Script will try to download `br` zone from ipdeny.com and setup ipset from local
 
 ## Usage commands
 
-You can use the script with the following command:
+You can use the script with the following command `./run.sh -h`:
 
 ```bash
 Usage: ./run.sh [options]
@@ -63,7 +63,7 @@ Options:
   -daz, --download-all-zones   Download all country zones from ipdeny.com (all-zones.tar.gz)
   -di, --delete-ipset          Delete ipset from firewalld (default: blcountries)
   -dl, --download-local        Download zones to local folder
-  -lz, --local-zones           Setup ipsets from local downloaded zones
+  -sl, --setup-from-local      Setup ipsets from local downloaded zones
   -sa, --setup-from-archive    Setup ipset from downloaded archive
   -h, --help                   Show this message (help)
 ```
