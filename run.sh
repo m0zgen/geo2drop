@@ -28,7 +28,7 @@ function usage() {
     echo "  -daz, --download-all-zones   Download all country zones from ipdeny.com (all-zones.tar.gz)"
     echo "  -di, --delete-ipset          Delete ipset from firewalld (default: blcountries)"
     echo "  -dl, --download-local        Download zones to local folder"
-    echo "  -lz, --local-zones           Setup ipsets from local downloaded zones"
+    echo "  -sl, --setup-from-local      Setup ipsets from local downloaded zones"
     echo "  -sa, --setup-from-archive    Setup ipset from downloaded archive"
     echo "  -h, --help                   Show this message (help)"
     exit 0
@@ -40,53 +40,36 @@ while [[ $# -gt 0 ]]; do
     case $key in
         -c|--countries)
             COUNTRIES="$2"
-            shift
-            shift
             ;;
         -ln|--list-name)
             LIST_NAME="$2"
-            shift
-            shift
             ;;
         -mx|--maxelem)
             MAXELEM="$2"
-            shift
-            shift
             ;;
         -hx|--hashsize)
             HASHSIZE="$2"
-            shift
-            shift
             ;;
         -am|--alternative-mirror)
             ANOTHER=1
-            shift
-            shift
             ;;
         -di|--delete-ipset)
             DELETE=1
-            shift
-            shift
             ;;
         -daz|--download-all-zones)
             DOWNLOAD_ALL_ZONES=1
-            shift
-            shift
             ;;
         -dl|--download-local)
             DOWNLOAD_LOCAL=1
-            shift
-            shift
             ;;
-        -lz|--local-zones)
+        -sl|--setup-from-local)
             SETUP_FROM_LOCAL=1
-            shift
-            shift
             ;;
         -sa|--setup-from-archive)
             SETUP_FROM_ARCHIVE=1
-            shift
-            shift
+            ;;
+        -d|--debug)
+            DEBUG=1
             ;;
         -h|--help)
             usage
@@ -96,6 +79,7 @@ while [[ $# -gt 0 ]]; do
             exit 1
             ;;
     esac
+    shift
 done
 
 # VAriables
@@ -329,10 +313,26 @@ function setup_from_online() {
 function setup_from_local() {
     # list files in download catalog
     echo ""
-    for i in $(ls ${DOWNLOAD_CATALOG}); do
-        echo "Processing ${DOWNLOAD_CATALOG}/${i}"
-        firewall-cmd --permanent --ipset=${LIST_NAME} --add-entries-from-file=${DOWNLOAD_CATALOG}/${i}
+
+    if is_site_available "${IPDENY_ROOT_URL}"; then
+        echo "Updating local zones..."
+        download_local
+    fi
+
+    for c in $COUNTRIES;do 
+        if [[ ! -f "${DOWNLOAD_CATALOG}/${c}.zone" ]]; then
+            echo "File ${DOWNLOAD_CATALOG}/${c}.zone not found!"
+        else
+            echo "File ${DOWNLOAD_CATALOG}/${c}.zone found. Adding to ipset ${LIST_NAME}..."
+            firewall-cmd --permanent --ipset=${LIST_NAME} --add-entries-from-file=${DOWNLOAD_CATALOG}/${c}.zone > /dev/null 2> /dev/null
+        fi
+
     done
+
+    # for i in $(ls ${DOWNLOAD_CATALOG}); do
+    #     echo "Processing ${DOWNLOAD_CATALOG}/${i}"
+    #     firewall-cmd --permanent --ipset=${LIST_NAME} --add-entries-from-file=${DOWNLOAD_CATALOG}/${i}
+    # done
 }
 
 function checking_firewalld_status(){
@@ -351,6 +351,8 @@ function add_ipset_to_drop_zone(){
     firewall-cmd --permanent --zone=drop --add-source="ipset:${LIST_NAME}"
 }
 
+# Main
+
 if [[ "$DOWNLOAD_ALL_ZONES" -eq "1" ]]; then
     check_all_zones_archive_size
     exit 0
@@ -367,8 +369,11 @@ if [[ "$DELETE" -eq "1" ]]; then
     exit 0
 fi
 
-delete_ipset
-create_ipset
+# If DEBUG skip this steps
+if [[ ! "$DEBUG" -eq "1" ]]; then
+    delete_ipset
+    create_ipset
+fi
 
 if [[ "$SETUP_FROM_LOCAL" -eq "1" ]]; then
     setup_from_local
@@ -379,13 +384,13 @@ else
 fi
 
 
-
-
-# check_drop
-add_ipset_to_drop_zone
-sleep 5
-firewall-cmd --reload
-checking_firewalld_status
+if [[ ! "$DEBUG" -eq "1" ]]; then
+    # check_drop
+    add_ipset_to_drop_zone
+    sleep 5
+    firewall-cmd --reload
+    checking_firewalld_status
+fi
 
 
 # firewall-cmd --permanent --ipset=blcountries --get-entries
