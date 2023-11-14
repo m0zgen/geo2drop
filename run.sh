@@ -40,15 +40,19 @@ while [[ $# -gt 0 ]]; do
     case $key in
         -c|--countries)
             COUNTRIES="$2"
+            shift
             ;;
         -ln|--list-name)
             LIST_NAME="$2"
+            shift
             ;;
         -mx|--maxelem)
             MAXELEM="$2"
+            shift
             ;;
         -hx|--hashsize)
             HASHSIZE="$2"
+            shift
             ;;
         -am|--alternative-mirror)
             ANOTHER=1
