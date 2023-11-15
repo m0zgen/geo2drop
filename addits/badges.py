@@ -39,5 +39,5 @@ def create_list_badge(list_name, list_description, file_badge, color_badge):
 
 # Generate badges
 create_date_badge()
-create_list_badge("all-zones.tar.gz", "All IP Zones", "all_zones.svg", "green")
+# create_list_badge("all-zones.tar.gz", "All IP Zones", "all_zones.svg", "green")
 
