@@ -259,7 +259,7 @@ function delete_ipset() {
             echo "Ipset ${LIST_NAME} deleted. Ok"
             exit 0
         else
-            echo "Ipset ${LIST_NAME} alredy deleted. Exit..."
+            echo "Ipset ${LIST_NAME} alredy deleted..."
         fi
     # elif exists ipset file
     elif [[ -f "/etc/firewalld/ipsets/${LIST_NAME}.xml" ]]; then
