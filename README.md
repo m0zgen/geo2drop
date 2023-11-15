@@ -73,3 +73,16 @@ Options:
   -sa, --setup-from-archive    Setup ipset from downloaded archive
   -h, --help                   Show this message (help)
 ```
+
+## AllZones from IpDeny 
+
+If ipdent.com restricted from your region, you can download updated file from this repo.
+
+Date: ![today](https://raw.githubusercontent.com/m0zgen/geo2drop/data/badge_date.svg)
+
+Download example:
+
+```bash
+wget https://github.com/m0zgen/geo2drop/raw/data/all-zones.tar.gz
+```
+
