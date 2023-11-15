@@ -11,7 +11,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Change work dir
 os.chdir(BASE_DIR)
-os.chdir("../public/files")
+os.chdir("../")
 
 
 def create_date_badge():
