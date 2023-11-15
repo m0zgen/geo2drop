@@ -205,7 +205,8 @@ function download_all_zones(){
 
     # If function argument is not empty
     if [[ ! -z "$1" ]]; then
-        wget -O ${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz  https://github.com/m0zgen/geo2drop/raw/data/all-zones.tar.gz
+        echo "Downloading from GitHub..."
+        wget -q -O ${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz  https://github.com/m0zgen/geo2drop/raw/data/all-zones.tar.gz
         echo "File saved to ${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz"
         tar -xzf ${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz -C ${UNPACK_CATALOG}
         echo "Files unpacked to ${UNPACK_CATALOG}"
