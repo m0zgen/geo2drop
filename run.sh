@@ -260,7 +260,6 @@ function delete_ipset() {
             exit 0
         else
             echo "Ipset ${LIST_NAME} alredy deleted. Exit..."
-            exit 0
         fi
     # elif exists ipset file
     elif [[ -f "/etc/firewalld/ipsets/${LIST_NAME}.xml" ]]; then
@@ -268,11 +267,11 @@ function delete_ipset() {
         grep -rl "${LIST_NAME}" /etc/firewalld | xargs sed -i "/${LIST_NAME}/d"
         systemctl restart firewalld
         echo "Ipset ${LIST_NAME} deleted. Firewalld restarted. Ok"
-        systemctl status firewalld
-        exit 0
+        # systemctl status firewalld
+        # exit 0
     else
-        echo "Ipset ${LIST_NAME} does not found. Exit..."
-        exit 0
+        echo "Ipset ${LIST_NAME} does not found..."
+        # exit 0
     fi
 
 }
