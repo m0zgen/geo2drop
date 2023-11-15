@@ -162,14 +162,27 @@ function download_local() {
 
 }
 
+function check_all_zones_from_github(){
+
+    if is_site_available "https://github.com/"; then
+        echo "Site GitGub.com is available. Ok"
+        echo "Downloading..."
+        download_all_zones github
+    else
+        echo "GitHub.com is not available. Exit. Bye!"
+        exit 1
+    fi
+
+}
+
 function check_all_zones_archive_size() {
 
     if is_site_available "${IPDENY_ROOT_URL}"; then
         echo "Site ${IPDENY_ROOT_URL} is available. Ok"
         echo "Checking file size..."
     else
-        echo "Site ${IPDENY_ROOT_URL} is not available. Exit..."
-        exit 1
+        echo "Site ${IPDENY_ROOT_URL} is not available. Try checkimg GitHub..."
+        check_all_zones_from_github
     fi
 
     # Check file exists
@@ -189,47 +202,21 @@ function check_all_zones_archive_size() {
 }
 
 function download_all_zones(){
+
+    # If function argument is not empty
+    if [[ ! -z "$1" ]]; then
+        wget -O ${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz  https://github.com/m0zgen/geo2drop/raw/data/all-zones.tar.gz
+        echo "File saved to ${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz"
+        tar -xzf ${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz -C ${UNPACK_CATALOG}
+        echo "Files unpacked to ${UNPACK_CATALOG}"
+    else
+        curl -s ${IPDENY_ROOT_URL}/ipblocks/data/countries/all-zones.tar.gz --output ${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz
+        echo "File saved to ${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz"
+        tar -xzf ${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz -C ${UNPACK_CATALOG}
+        echo "Files unpacked to ${UNPACK_CATALOG}"
+    fi
+
     
-    if is_site_available "${IPDENY_ROOT_URL}"; then
-        echo "Site ${IPDENY_ROOT_URL} is available. Ok"
-    else
-        echo "Site ${IPDENY_ROOT_URL} is not available. Exit..."
-        exit 1
-    fi
-
-    curl -s ${IPDENY_ROOT_URL}/ipblocks/data/countries/all-zones.tar.gz --output ${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz
-    echo "File saved to ${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz"
-    tar -xzf ${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz -C ${UNPACK_CATALOG}
-    echo "Files unpacked to ${UNPACK_CATALOG}"
-
-}
-
-function check_all_zones_archive_size() {
-
-    if is_site_available "${IPDENY_ROOT_URL}"; then
-        echo "Site ${IPDENY_ROOT_URL} is available. Ok"
-        echo "Checking file size..."
-    else
-        echo "Site ${IPDENY_ROOT_URL} is not available. Exit..."
-        exit 1
-    fi
-
-    # Check file exists
-    if [[ ! -f "${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz" ]]; then
-        echo "File not exists. Downloading..."
-        download_all_zones
-    fi
-
-    local LocalFileSize=$(wc -c < "${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz" | tr -d ' ')
-    local RemoteFileSize=$(curl -sI ${IPDENY_ROOT_URL}/ipblocks/data/countries/all-zones.tar.gz | awk '/content-length/ {sub("\r",""); print $2}' | tr -d ' ')
-    echo -e "Local file size: ${LocalFileSize}. Remote file size: ${RemoteFileSize}."
-
-    if [[ "${LocalFileSize}" -eq "${RemoteFileSize}" ]]; then
-        echo "File size is equal. Ok"
-    else
-        echo "File size is not equal. Downloading..."
-        download_all_zones
-    fi
 
 }
 
@@ -328,10 +315,7 @@ function setup_from_local() {
     # list files in download catalog
     echo ""
 
-    if is_site_available "${IPDENY_ROOT_URL}"; then
-        echo "Updating local zones..."
-        download_local
-    fi
+    check_all_zones_archive_size
 
     for c in $COUNTRIES;do 
         if [[ ! -f "${DOWNLOAD_CATALOG}/${c}.zone" ]]; then
