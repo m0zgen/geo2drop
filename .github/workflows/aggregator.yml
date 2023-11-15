@@ -43,7 +43,7 @@ jobs:
         run: |
           git checkout --orphan data
           git rm -rf .
-          sudo rm -rf download
+          sudo rm -rf download addits local.list README.md run.sh .gitignore .github
 
       - name: Add files
         if: ${{ success() }}
