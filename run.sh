@@ -256,11 +256,22 @@ function delete_ipset() {
             firewall-cmd --permanent --delete-ipset=${LIST_NAME} &> /dev/null
             # grep -rl "${LIST_NAME}" /etc/firewalld | xargs sed -i "/${LIST_NAME}/d"
             firewall-cmd --reload
+            echo "Ipset ${LIST_NAME} deleted. Ok"
+            exit 0
         fi
-    else
+    # elif exists ipset file
+    elif [[ -f "/etc/firewalld/ipsets/${LIST_NAME}.xml" ]]; then
         rm  /etc/firewalld/ipsets/${LIST_NAME}.xml
         grep -rl "${LIST_NAME}" /etc/firewalld | xargs sed -i "/${LIST_NAME}/d"
         systemctl restart firewalld
+        echo "Ipset ${LIST_NAME} deleted. Firewalld restarted. Ok"
+        systemctl status firewalld
+        exit 0
+    else
+        systemctl restart firewalld
+        echo "Ipset ${LIST_NAME} alredy deleted. Exit..."
+        systemctl status firewalld
+        exit 0
     fi
 
 }
