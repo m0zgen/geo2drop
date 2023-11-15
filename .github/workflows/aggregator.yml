@@ -42,9 +42,8 @@ jobs:
         run: |
           git checkout --orphan data
           git rm -rf .
-          sudo rm -rf download merged public upload cactusd
-          cp -rf /tmp/*.txt .
-          cp -rf /tmp/*.svg .
+          mv download/all-zones.tar.gz .
+          sudo rm -rf download
 
       - name: Add files
         if: ${{ success() }}
