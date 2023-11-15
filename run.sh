@@ -258,6 +258,9 @@ function delete_ipset() {
             firewall-cmd --reload
             echo "Ipset ${LIST_NAME} deleted. Ok"
             exit 0
+        else
+            echo "Ipset ${LIST_NAME} alredy deleted. Exit..."
+            exit 0
         fi
     # elif exists ipset file
     elif [[ -f "/etc/firewalld/ipsets/${LIST_NAME}.xml" ]]; then
@@ -268,9 +271,7 @@ function delete_ipset() {
         systemctl status firewalld
         exit 0
     else
-        systemctl restart firewalld
-        echo "Ipset ${LIST_NAME} alredy deleted. Exit..."
-        systemctl status firewalld
+        echo "Ipset ${LIST_NAME} does not found. Exit..."
         exit 0
     fi
 
