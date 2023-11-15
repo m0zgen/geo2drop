@@ -355,7 +355,7 @@ echo "Defined Countries: $COUNTRIES"
 
 if [[ "$DOWNLOAD_ALL_ZONES" -eq "1" ]]; then
     check_all_zones_archive_size
-    exit 0
+    # exit 0
 fi
 
 
