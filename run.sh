@@ -257,7 +257,6 @@ function delete_ipset() {
             # grep -rl "${LIST_NAME}" /etc/firewalld | xargs sed -i "/${LIST_NAME}/d"
             firewall-cmd --reload
             echo "Ipset ${LIST_NAME} deleted. Ok"
-            exit 0
         else
             echo "Ipset ${LIST_NAME} alredy deleted..."
         fi
@@ -268,10 +267,8 @@ function delete_ipset() {
         systemctl restart firewalld
         echo "Ipset ${LIST_NAME} deleted. Firewalld restarted. Ok"
         # systemctl status firewalld
-        # exit 0
     else
         echo "Ipset ${LIST_NAME} does not found..."
-        # exit 0
     fi
 
 }
