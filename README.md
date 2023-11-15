@@ -78,7 +78,7 @@ Options:
 
 If ipdent.com restricted from your region, you can download updated file from this repo.
 
-Date: ![today](https://raw.githubusercontent.com/m0zgen/geo2drop/data/badge_date.svg)
+![geo2drop update all IP zones date](https://raw.githubusercontent.com/m0zgen/geo2drop/data/badge_date.svg)
 
 Download example:
 
