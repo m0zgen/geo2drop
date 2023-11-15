@@ -76,7 +76,7 @@ Options:
 
 ## AllZones from IpDeny 
 
-If ipdent.com restricted from your region, you can download updated file from this repo.
+If [ipdeny.com](https://www.ipdeny.com/ipblocks/) restricted from your region, you can download updated file from this repo.
 
 ![geo2drop update all IP zones date](https://raw.githubusercontent.com/m0zgen/geo2drop/data/badge_date.svg)
 
