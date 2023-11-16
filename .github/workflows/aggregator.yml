@@ -26,7 +26,7 @@ jobs:
 
       - name: Generate lists
         run: |
-          sudo ./run.sh -daz
+          sudo ./run.sh -do
           mv download/all-zones.tar.gz .
           ls .
           sudo python3 addits/badges.py
