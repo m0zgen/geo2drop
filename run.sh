@@ -26,7 +26,8 @@ function usage() {
     echo "  -mx, --maxelem <maxelem>     Maximum number of elements in the ipset list (default: 131072)"
     echo "  -hx, --hashsize <hashsize>   Hash size of the ipset list (default: 32768)"
     echo "  -am, --alternative-mirror    Another IP source mirror (default: ipdeny.com)"
-    echo "  -daz, --download-all-zones   Download all country zones from ipdeny.com (all-zones.tar.gz)"
+    echo "  -daz, --download-all-zones   Download all zones and setup ipset"
+    echo "  -do, --download-only         Download all country zones from ipdeny.com (all-zones.tar.gz)"
     echo "  -di, --delete-ipset          Delete ipset from firewalld (default: blcountries)"
     echo "  -dl, --download-local        Download zones to local folder"
     echo "  -ll, --local-country-list    Define local country list (default: local.list)"
@@ -64,6 +65,9 @@ while [[ $# -gt 0 ]]; do
             ;;
         -daz|--download-all-zones)
             DOWNLOAD_ALL_ZONES=1
+            ;;
+        -do|--download-only)
+            DOWNLOAD_ONLY=1
             ;;
         -dl|--download-local)
             DOWNLOAD_LOCAL=1
@@ -217,8 +221,6 @@ function download_all_zones(){
         echo "Files unpacked to ${UNPACK_CATALOG}"
     fi
 
-    
-
 }
 
 function setup_from_archive(){
@@ -361,6 +363,11 @@ function add_ipset_to_drop_zone(){
 # Main
 
 echo "Defined Countries: $COUNTRIES"
+
+if [[ "$DOWNLOAD_ONLY" -eq "1" ]]; then
+    download_all_zones
+    exit 0
+fi
 
 if [[ "$DOWNLOAD_ALL_ZONES" -eq "1" ]]; then
     check_all_zones_archive_size
