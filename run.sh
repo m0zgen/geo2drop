@@ -184,24 +184,29 @@ function check_all_zones_archive_size() {
     if is_site_available "${IPDENY_ROOT_URL}"; then
         echo "Site ${IPDENY_ROOT_URL} is available. Ok"
         echo "Checking file size..."
+
+        # Check file exists
+        if [[ ! -f "${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz" ]]; then
+            local LocalFileSize=$(stat -c%s "${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz")
+            local RemoteFileSize=$(curl -sI ${IPDENY_ROOT_URL}/ipblocks/data/countries/all-zones.tar.gz | grep -i Content-Length | awk '{print $2}' | tr -d '\r')
+            echo -e "Local file size: ${LocalFileSize}. Remote file size: ${RemoteFileSize}."
+
+            if [[ "${LocalFileSize}" -eq "${RemoteFileSize}" ]]; then
+                echo "File size is equal. Ok"
+                echo "Unpacking..."
+                tar -xzf ${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz -C ${UNPACK_CATALOG}
+                echo "Files unpacked to ${UNPACK_CATALOG}"
+            else
+                echo "File size is not equal. Downloading..."
+                download_all_zones
+            fi
+        fi
+
     else
         echo "Site ${IPDENY_ROOT_URL} is not available. Try checkimg GitHub..."
         check_all_zones_from_github
     fi
 
-    # Check file exists
-    if [[ ! -f "${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz" ]]; then
-        local LocalFileSize=$(stat -c%s "${DOWNLOAD_FULL_CATALOG}/all-zones.tar.gz")
-        local RemoteFileSize=$(curl -sI ${IPDENY_ROOT_URL}/ipblocks/data/countries/all-zones.tar.gz | grep -i Content-Length | awk '{print $2}' | tr -d '\r')
-        echo -e "Local file size: ${LocalFileSize}. Remote file size: ${RemoteFileSize}."
-
-        if [[ "${LocalFileSize}" -eq "${RemoteFileSize}" ]]; then
-            echo "File size is equal. Ok"
-        else
-            echo "File size is not equal. Downloading..."
-            download_all_zones
-        fi
-    fi
 
 }
 
