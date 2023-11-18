@@ -337,7 +337,7 @@ function setup_from_local() {
         if [[ ! -f "${DOWNLOAD_CATALOG}/${c}.zone" ]]; then
             echo "File ${DOWNLOAD_CATALOG}/${c}.zone not found!"
         else
-            echo "File ${DOWNLOAD_CATALOG}/${c}.zone found. Adding to ipset ${LIST_NAME}..."
+            echo "File ${DOWNLOAD_CATALOG}/${c}.zone Ok. Adding to ipset ${LIST_NAME}..."
             firewall-cmd --permanent --ipset=${LIST_NAME} --add-entries-from-file=${DOWNLOAD_CATALOG}/${c}.zone > /dev/null 2> /dev/null
         fi
 
