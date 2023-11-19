@@ -7,7 +7,7 @@
 PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd); cd ${SCRIPT_PATH}
 
-ZONES="br cn id mx py"
+ZONES="br id ke za"
 IPSET_NAME="blcountries"
 IPDENY_ROOT_URL="https://www.ipdeny.com"
 LOCAL_LIST="${SCRIPT_PATH}/local.list"
