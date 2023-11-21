@@ -24,7 +24,7 @@ jobs:
         run: |
           sudo python3 -m pip install pybadges
 
-      - name: Generate lists
+      - name: Download lists and gen badges
         run: |
           sudo ./run.sh -do
           mv download/all-zones.tar.gz .
