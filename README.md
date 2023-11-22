@@ -29,6 +29,8 @@ You can use the script with the following command:
 ./run.sh -sa
 ```
 
+Or set custom `local.list` file and run:
+
 ```bash
 ./run.sh -ll -sa
 ```
