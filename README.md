@@ -26,7 +26,11 @@ ZONES="br cn in"
 You can use the script with the following command:
 
 ```bash
-./run.sh -daz; ./run.sh -sa
+./run.sh -sa
+```
+
+```bash
+./run.sh -ll -sa
 ```
 
 Or just run:
@@ -35,25 +39,19 @@ Or just run:
 ./run.sh
 ```
 
-Or from try download zones, if it not available install it from repo located zones:
+You can just download zones to local catalog:
 
 ```bash
-./run.sh -dl; ./run.sh -lz
+./run.sh -do
 ```
 
-You can pass multiple argument to the script:
+You can pass country code with `-c` option:
 
 ```bash
-./run.sh -c "br" -sl
+./run.sh -c "br"
 ```
 
 Script will try to download `br` zone from ipdeny.com and setup ipset from local downloaded zones, if ipdeny site not available, script will setup ipset from repo located zones.
-
-## Cron.d example
-
-```bash
-0 1 * * * root /path/to/geo2drop/run.sh -ll -sl
-```
 
 ## Usage commands
 
