@@ -1,6 +1,8 @@
 name: geo2drop-agro
 on:
- push:s
+ push:
+   branches:
+     - master
   # schedule:
   #   - cron: "* */12 * * *"
 
