@@ -1,10 +1,8 @@
 name: geo2drop-agro
 on:
-#  push:
-#    branches:
-#      - master
-  schedule:
-    - cron: "* */12 * * *"
+ push:s
+  # schedule:
+  #   - cron: "* */12 * * *"
 
 jobs:
   build:
@@ -55,4 +53,4 @@ jobs:
         if: ${{ success() }}
         run: |
           git commit -m "Geo IP generated!"
-          git push origin data
+          git push origin data --force
